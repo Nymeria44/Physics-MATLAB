@@ -14,7 +14,7 @@ M_sun = 1.98847e+30;  % mass of sun (kg)
 % Defining parameters
 simRes = 0.005; % Defines the minimum distance between coordinates
 
-M_sol = 1; % Mass of Black Hole (Solar Masses)
+M_sol = 100; % Mass of Black Hole (Solar Masses)
 M = M_sol * M_sun; % Mass of Black Hole (Kg)
 rs = 2*G*M/c^2;  % Schwarzschild radius
 R = 1*rs;  % Radius of the de Sitter space relative to black hole
@@ -49,7 +49,7 @@ ds_sqr = -f_r .* dt.^2 + (dr.^2 ./ f_r) .* r.^2 .* (dtheta.^2 + (sin(theta)).^2 
 ds = sqrt(ds_sqr);
 
 %----------------------------------------
-% PLOT
+% PLOT SPACETIME
 %----------------------------------------
 % Converting radial coordinates into Cartesian
 [R_mesh, Theta_mesh] = meshgrid(r, theta);
@@ -66,13 +66,34 @@ xlabel('x (spatial dimension)');
 ylabel('y (spatial dimension)');
 zlabel('Spacetime Interval (ds)');
 
-% Identify and plot horizons
-% horizon_r = r(abs(f_r) == min(abs(f_r))); % Find the horizon location
-% horizon = plot3(horizon_r * sin(pi), horizon_r * cos(pi), 0, 'ro', 'MarkerSize', 10);
+%----------------------------------------
+% PLOT HORIZONS (NOT FUNCTIONAL)
+%----------------------------------------
+% Solve for roots of the horizon equation
+horizon_equ = @(r) 1 - r.^3 / R^2 - 2*M*G;
+horizon_coefficients = [(-1/R^2), -2*M*G, 1];
+horizon_r = roots(horizon_coefficients);
+
+% Filter real and positive roots
+horizon_r = horizon_r(imag(horizon_r) == 0 & real(horizon_r) > 0);
+
+% Convert horizons to Cartesian coordinates
+x_horizon = horizon_r * sin(Theta_mesh);
+y_horizon = horizon_r * cos(Theta_mesh);
+z_horizon = zeros(size(x_horizon));
+
+x_horizon = sum(x_horizon, 1);
+y_horizon = sum(y_horizon, 1);
+z_horizon = sum(z_horizon, 1);
+
+% Add horizons to the existing surf plot
+hold on;
+p.LineWidth = 1000;
+horizon = plot3(x_horizon, y_horizon, z_horizon);
+hold off;
 
 % Set viewing position and axis limits
 view(20, 25); % Camera tilt
 
-
 % Add legend for the horizon
-% legend(horizon, 'Black Hole Horizon');
+legend(horizon, 'Black Hole Horizon');

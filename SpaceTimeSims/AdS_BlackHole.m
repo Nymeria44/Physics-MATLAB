@@ -5,7 +5,7 @@ clear; clc;
 %----------------------------------------
 % PARAMETERS
 %----------------------------------------
-k = 1;  % Curvature of AdS spacetime (positive value)
+k = 0.5;  % Curvature of AdS spacetime (positive value)
 C = 1;  % Describes the curvature of the black hole?
 d = 3;  % Dimensionality of spacetime
 
