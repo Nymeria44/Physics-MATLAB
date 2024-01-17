@@ -1,12 +1,18 @@
+% Simulation itterates over values of C, creating a video of the different
+% geometries
+
 clear; clc;
 
-% Define the parameters
-k = 1;        % curvature of AdS spacetime (positive value)
-d = 3;        % Dimensionality
+%----------------------------------------
+% PARAMETERS
+%----------------------------------------
+k = 1;  % curvature of AdS spacetime (positive value)
+d = 3;  % Dimensionality of spacetime
+C_values = 1:0.05:10;   % Define the range of C values
 
-% Define the range of C values
-C_values = 1:0.05:10;
-
+%----------------------------------------
+% RECORDING
+%----------------------------------------
 % Set up the video writer
 outputVideo = VideoWriter('AdS_Geometry_Visualization.mp4');
 open(outputVideo);

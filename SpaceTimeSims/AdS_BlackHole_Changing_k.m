@@ -1,12 +1,18 @@
+% Simulation itterates over values of k, creating a video of the different
+% geometries
+
 clear; clc;
 
-% Define the parameters
-C = 1;        % curvature of AdS spacetime (positive value)
-d = 3;        % Dimensionality
+%----------------------------------------
+% PARAMETERS
+%----------------------------------------
+C = 1;  % Describes the curvature of the black hole?
+d = 3;  % Dimensionality of spacetime
+K_values = [0.001:0.01:1, 1:1:100]; % Define the range of k values
 
-% Define the range of C values
-K_values = [0.001:0.01:1, 1:1:100];
-
+%----------------------------------------
+% RECORDING
+%----------------------------------------
 % Set up the video writer
 outputVideo = VideoWriter('AdS_Geometry_Visualization.mp4');
 open(outputVideo);
