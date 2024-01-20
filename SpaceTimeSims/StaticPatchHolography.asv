@@ -12,7 +12,7 @@ M_sol = 10; % Mass of Black Hole (Solar Masses)
 % CALCULATIONS
 %----------------------------------------
 [rs, M] = calcBHRadius(M_sol);  % Finding Schwarzschild radius
-R = 2*rs;  % Radius of the de Sitter space relative to black hole
+R = 10*rs;  % Radius of the de Sitter space relative to black hole
 
 % Generating radial coordiantes
 [r, t, theta, phi, dr, dt, dtheta, dphi] = generateCoordinates(simRes, R); 
@@ -23,33 +23,27 @@ ds = spaceTimeInterval (r,R,M,theta,dt,dr,dtheta,dphi);
 %----------------------------------------
 % PLOT SPACETIME
 %----------------------------------------
-% Converting radial coordinates into Cartesian
-[x, y] = sphToCart (r, theta);
-[ds_matrix] = meshgrid(ds);
-
-figure;
+% % Converting radial coordinates into Cartesian
+% [x, y] = sphToCart (r, theta);
+% [ds_matrix] = meshgrid(ds);
+% 
+% figure;
 % Spacetime = surf(x, y, ds_matrix, 'FaceAlpha', 0.9);
+% 
+% % Add title and labels
+% title('Visualization of Schwarzschild-de Sitter Black Hole');
+% xlabel('x (spatial dimension)');
+% ylabel('y (spatial dimension)');
+% zlabel('Spacetime Interval (ds)');
+% 
+% % Set viewing position
+% view(20, 25); % Camera tilt
 
 % Plot horizons
 r_h = findHorizons(R, M);
 ds_h = spaceTimeInterval (r_h,R,M,theta,dt,dr,dtheta,dphi);
 [x_h, y_h] = sphToCart (r_h, theta);
 
-hold on;
-horizon = plot3(x_h, y_h, ds_h, 'ro', 'MarkerSize', 10);
-hold off;
-
-% Add legend for the horizon
-legend(horizon, 'Horizons');
-
-% Add title and labels
-title('Visualization of Schwarzschild-de Sitter Black Hole');
-xlabel('x (spatial dimension)');
-ylabel('y (spatial dimension)');
-zlabel('Spacetime Interval (ds)');
-
-% Set viewing position
-view(20, 25); % Camera tilt
 
 %----------------------------------------
 % FUNCTIONS
@@ -116,3 +110,17 @@ function r_h = findHorizons(R, M)
     % Filter real and positive roots
     r_h = r_h(imag(r_h) == 0 & real(r_h) > 0);
 end
+
+% % Convert polar coordinates of the horizon to Cartesian coordinates
+%     [x_horizon, y_horizon] = sphToCart(r_h, pi/2); % Assuming horizon is at theta = pi/2
+% 
+%     % Evaluate the spacetime interval at the horizon points
+%     ds_horizon = spaceTimeInterval(r_h, R, M, pi/2, 0, 0, 0, 0);
+% 
+%     % Add horizons to the existing surf plot
+%     hold on;
+%     horizon = plot3(x_horizon, y_horizon, ds_horizon, 'ro', 'MarkerSize', 10);
+%     hold off;
+% 
+%     % Add legend for the horizon
+%     legend(horizon, 'Black Hole Horizon');
