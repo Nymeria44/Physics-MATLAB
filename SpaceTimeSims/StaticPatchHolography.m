@@ -6,13 +6,13 @@ clear; clc;
 % PARAMETERS
 %----------------------------------------
 simRes = 0.005; % Defines the minimum distance between coordinates
-M_sol = 10; % Mass of Black Hole (Solar Masses)
+M = 4000; % % Mass of Black Hole (KG)
 
 %----------------------------------------
 % CALCULATIONS
 %----------------------------------------
-[rs, M] = calcBHRadius(M_sol);  % Finding Schwarzschild radius
-R = 2*rs;  % Radius of the de Sitter space relative to black hole
+rs = calcBHRadius(M);  % Finding Schwarzschild radius
+R = rs * 10E10;  % Radius of the de Sitter space relative to black hole
 
 % Generating radial coordiantes
 [r, t, theta, phi, dr, dt, dtheta, dphi] = generateCoordinates(simRes, R); 
@@ -28,7 +28,7 @@ ds = spaceTimeInterval (r,R,M,theta,dt,dr,dtheta,dphi);
 [ds_matrix] = meshgrid(ds);
 
 figure;
-% Spacetime = surf(x, y, ds_matrix, 'FaceAlpha', 0.9);
+Spacetime = surf(x, y, ds_matrix, 'FaceAlpha', 0.9);
 
 % Plot horizons
 r_h = findHorizons(R, M);
@@ -55,12 +55,12 @@ view(20, 25); % Camera tilt
 % FUNCTIONS
 %----------------------------------------
 % Determines the radius of the event horizon according to the Schwarzschild Radius
-function [rs, M] = calcBHRadius(M_sol)
+function [rs] = calcBHRadius(M)
     c = 2.99792458E8; % Speed of light
     G = 6.67408E-11; % Gravitational Constant
-    M_sun = 1.98847e+30;  % mass of sun (kg)
+    % M_sun = 1.98847e+30;  % mass of sun (kg)
 
-    M = M_sol * M_sun; % Mass of Black Hole (Kg)
+    % M = M_sol * M_sun; % Mass of Black Hole (Kg)
     rs = 2*G*M/c^2;  % Schwarzschild radius
 end
 
@@ -69,7 +69,7 @@ function [r, t, theta, phi, dr, dt, dtheta, dphi] = generateCoordinates(simRes, 
 
     % Create radial and angular coordinates
     r = (0:simRes:1) * R;
-    t = (0:simRes:1) * R;
+    t = (0:simRes:1) * (R/2);
     theta = (0:simRes:1) * pi;
     phi = (0:simRes:1) * 2 * pi;
 
