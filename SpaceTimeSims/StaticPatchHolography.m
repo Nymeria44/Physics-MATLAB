@@ -5,7 +5,9 @@ clear; clc;
 %----------------------------------------
 % PARAMETERS
 %----------------------------------------
-simRes = 0.005; % Defines the minimum distance between coordinates
+simRes = 0.005; % Defines the minimum interval between coordinates (from 0 to 1)
+
+% NOTE: the spacetime metric is only valid for small black holes
 M = 4000; % % Mass of Black Hole (KG)
 
 %----------------------------------------
@@ -28,21 +30,26 @@ ds = spaceTimeInterval (r,R,M,theta,dt,dr,dtheta,dphi);
 [ds_matrix] = meshgrid(ds);
 
 figure;
-Spacetime = surf(x, y, ds_matrix, 'FaceAlpha', 0.9);
+Spacetime = surf(x, y, ds_matrix);
+colormap('jet');
 
-% Plot horizons
+% Dotted lines on mesh for better visibility
+set(Spacetime,'LineStyle',':') 
+
+%----------------------------------------
+% PLOT HORIZONS
+%----------------------------------------
+% finding horizon of de Sitter space
 r_h = findHorizons(R, M);
 ds_h = spaceTimeInterval (r_h,R,M,theta,dt,dr,dtheta,dphi);
 [x_h, y_h] = sphToCart (r_h, theta);
 
 hold on;
-horizon = plot3(x_h, y_h, ds_h, 'ro', 'MarkerSize', 10);
+deSitterHorizon = plot3(x_h, y_h, ds_h, 'r', 'LineWidth', 4);
 hold off;
 
-% Add legend for the horizon
-legend(horizon, 'Horizons');
-
-% Add title and labels
+% legend, title and labels
+legend(deSitterHorizon, 'de Sitter Horizon');
 title('Visualization of Schwarzschild-de Sitter Black Hole');
 xlabel('x (spatial dimension)');
 ylabel('y (spatial dimension)');
@@ -58,15 +65,12 @@ view(20, 25); % Camera tilt
 function [rs] = calcBHRadius(M)
     c = 2.99792458E8; % Speed of light
     G = 6.67408E-11; % Gravitational Constant
-    % M_sun = 1.98847e+30;  % mass of sun (kg)
 
-    % M = M_sol * M_sun; % Mass of Black Hole (Kg)
     rs = 2*G*M/c^2;  % Schwarzschild radius
 end
 
 % Generates spacetime coordinates and their intergal
 function [r, t, theta, phi, dr, dt, dtheta, dphi] = generateCoordinates(simRes, R)
-
     % Create radial and angular coordinates
     r = (0:simRes:1) * R;
     t = (0:simRes:1) * (R/2);
@@ -107,12 +111,10 @@ end
 function r_h = findHorizons(R, M)
     G = 6.67408E-11; % Gravitational Constant
 
-    % Define the horizon equation as a polynomial
+    % Solving f_r equation for roots
     horizon_coefficients = [(-1/R^2), -2*M*G, 1];
-
-    % Solve for roots using roots function
     r_h = roots(horizon_coefficients);
 
-    % Filter real and positive roots
+    % Filtering for real and positive roots
     r_h = r_h(imag(r_h) == 0 & real(r_h) > 0);
 end
