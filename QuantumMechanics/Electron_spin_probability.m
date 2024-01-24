@@ -1,27 +1,36 @@
-% Define the vectors n and m
-n = [0.7071; 0.0; 0.7071]; % For example, n = [sqrt(2)/2; 0; sqrt(2)/2]
-m = [0.5; 0.5; 0.7071];   % For example, m = [0.5; 0.5; sqrt(2)/2]
+% Very simple simulation which shows the probability of measuring the
+% spin of an electron to be up realtive to a measurement device. The device is rotated
+% over 360 degrees (from the inital starting position).
+clear; clc;
 
-% Define an array of angles from 0 to pi
-angles = linspace(0, pi, 1000);
+% Unit vector for the orientation of electron spin (3D space)
+n = [0.7071; 0.0; 0.7071];
 
-% Initialise an array to store probabilities
-probabilities = zeros(size(angles));
+% Unit vector for the orientation of the measurement device (3D space)
+m = [0.7071; 0.0; 0.7071];
+
+
+% Array of angles from 0 to 2pi
+angles = linspace(0, 2*pi, 1000);
 
 % Calculate the probability for each angle
-for i = 1:length(angles)
-    angle = angles(i);
-    cos_theta_mn = dot(n, m) * cos(angle);
-    probabilities(i) = (1 + cos_theta_mn) / 2;
-end
+average = dot(n, m) * cos(angles);
+probabilities = (1 + average) / 2;
 
-% Create a plot
+% Plotting
 figure;
+subplot(2,1,1);
 plot(angles, probabilities);
 title('Probability of Measuring Spin Up vs. Angle');
 xlabel('Angle (radians)');
 ylabel('Probability');
 ylim([0, 1]);
+
+subplot(2,1,2);
+plot(angles,average);
+title('Average value (for repeated experiments) vs. angle');
+xlabel('Angle (radians)');
+ylabel('Average');
 
 % Display the maximum probability and corresponding angle
 [max_prob, max_idx] = max(probabilities);
