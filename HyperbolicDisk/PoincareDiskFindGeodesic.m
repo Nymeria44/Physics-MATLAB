@@ -4,22 +4,23 @@
 % 
 % This is done by taking a point, A, finding the inverse of the
 % point, B, (located outside of the unit sphere). Then the circle passing
-% through both A and B will produce an arc tracing the Hyperbolic Geometry.
+% through both A and B will produce an arc inside of the Poincaré Disk, tracing 
+% a Geodesic (straight line) in the Hyperbolic Geometry.
 %--------------------------------------------------------------------------------
 clear; clc;
 
 %--------------------------------------------------------------------------------
 % PARAMETERS
 %--------------------------------------------------------------------------------
-boundaryRes = 100; % Number of points used to generate boundary of disk
+simRes = 100; % Number of points used to generate lines
 A = [0.5, 0.5]; % Point within the unit circle
 O = [0, 0]; % Origin
 
 %--------------------------------------------------------------------------------
 % CALCULATIONS
 %--------------------------------------------------------------------------------
-% Creating boundary of the disk
-Gamma = createCircle(O, 1, boundaryRes);
+% Creating boundary of the Poincaré Disk
+Gamma = createCircle(O, 1, simRes);
 
 % Creating line passing through O A
 OA_line = createSymbolicLine(O, A);
@@ -34,17 +35,22 @@ AB_mid = (A + B) / 2;
 AB_r = sqrt((A(1) - B(1))^2 + (A(2) - B(2))^2)/2;
 
 % Creating circle which traces the geodesic
-AB_circ = createCircle(AB_mid, AB_r, boundaryRes);
+%AB_circ = createCircle(AB_mid, AB_r, simRes);
 
 % Determing the points where Poincaré Disk and AB circle intersect
 [I1, I2] = findCircleIntersections(O, 1, AB_mid, AB_r);
 
 % Finding Geodesic of disk
-Geodesic = createGodesicArc (I1, I2, AB_mid, AB_r, boundaryRes);
+Geodesic = createGodesicArc (I1, I2, AB_mid, AB_r, simRes);
 
 %--------------------------------------------------------------------------------
 % PLOTTING
 %--------------------------------------------------------------------------------
+% Plotting the boundary circle
+hold on;
+plot(Gamma(:, 1), Gamma(:, 2), 'k-', 'DisplayName', 'Unit Circle');
+
+% Plotting the geodesic line
 % Plotting the boundary circle
 hold on;
 plot(Gamma(:, 1), Gamma(:, 2), 'k-', 'DisplayName', 'Unit Circle');
@@ -78,8 +84,7 @@ text(I2(1), I2(2), '  Intersection P2', 'HorizontalAlignment', ...
     'left', 'VerticalAlignment', 'bottom');
 
 grid on;
-xlim([-5 5])
-ylim([-5 5])
+axis equal;
 legend('Location', 'best');
 
 %--------------------------------------------------------------------------------
@@ -134,6 +139,7 @@ function [intersection1, intersection2] = findCircleIntersections(O1, r1, O2, r2
     intersection2 = double([sol.x(2) + O1(1), sol.y(2) + O1(2)]);
 end
 
+% Creates geodesic arch
 % Creates geodesic arch
 function arc = createGodesicArc(P1, P2, O, r, boundaryRes)
     % Calculate angles corresponding to the two points
