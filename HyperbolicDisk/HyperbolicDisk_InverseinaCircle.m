@@ -5,7 +5,7 @@ clear; clc;
 % PARAMETERS
 %----------------------------------------
 boundaryRes = 100; % Number of points used to generate boundary of disk
-A = [0.01, 0.96]; % Point within the unit circle
+A = [0.1, 0.1]; % Point within the unit circle
 O = [0, 0]; % Origin
 
 %----------------------------------------
@@ -21,7 +21,7 @@ Gamma = createCircle(O, 1, boundaryRes);
 OA_line = createLineSymbolic(O, A);
 
 % Finding the inversion point B
-B = findInversionPoint(A, OA_line);
+B = findInversionPoint(A,O);
 
 %----------------------------------------
 % Plotting
@@ -38,9 +38,9 @@ plot(A(1), A(2), 'ro', 'DisplayName', 'Point A');
 
 % Plotting the inversion point B
 plot(B(1), B(2), 'go', 'DisplayName', 'Point B');
-
 grid on;
-legend();
+xlim([-5 5])
+ylim([-5 5])
 
 %----------------------------------------
 % FUNCTIONS
@@ -66,20 +66,13 @@ function line = createLineSymbolic(O, A)
 end
 
 % Finds the point of inversion
-% Finds the point of inversion
-function B = findInversionPoint(A, OA_line)
+function B = findInversionPoint(A,O)
     % Calculate length of OB
     mag_OB = 1 / norm(A);
 
     % Determine the direction of OA
-    direction_OA = A / norm(A);
+    direction_OA = (A - O) / norm(A - O);
 
     % Calculate the coordinates of B along the line OA
-    B_coords = A + mag_OB * direction_OA;
-
-    % Project B onto the line OA
-    B_projection = [B_coords(1), polyval(sym2poly(OA_line), B_coords(1))];
-
-    % Return the final inversion point B
-    B = B_projection;
+    B = mag_OB * direction_OA;
 end
