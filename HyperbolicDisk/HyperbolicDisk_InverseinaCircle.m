@@ -12,7 +12,7 @@ clear; clc;
 % PARAMETERS
 %--------------------------------------------------------------------------------
 boundaryRes = 100; % Number of points used to generate boundary of disk
-A = [0.1, 0.1]; % Point within the unit circle
+A = [0.5, 0.5]; % Point within the unit circle
 O = [0, 0]; % Origin
 
 %--------------------------------------------------------------------------------
@@ -48,23 +48,39 @@ Geodesic = createGodesicArc (I1, I2, AB_mid, AB_r, boundaryRes);
 % Plotting the boundary circle
 hold on;
 plot(Gamma(:, 1), Gamma(:, 2), 'k-', 'DisplayName', 'Unit Circle');
-plot(Geodesic(:, 1), Geodesic(:, 2), 'k-', 'DisplayName', 'Unit Circle')
+
+% Plotting the geodesic line
+plot(Geodesic(:, 1), Geodesic(:, 2), 'k-', 'DisplayName', 'Geodesic Line')
 
 % Plotting the line OA
 fplot(OA_line, 'b--', 'DisplayName', 'Line OA');
 
 % Plotting the point A
 plot(A(1), A(2), 'ro', 'DisplayName', 'Point A');
+text(A(1), A(2), '  A', 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom');
+
 % Plotting the inversion point B
 plot(B(1), B(2), 'go', 'DisplayName', 'Point B');
+text(B(1), B(2), '  B', 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
+
 % Plotting midpoint of AB
 plot(AB_mid(1), AB_mid(2), 'co', 'DisplayName', 'Midpoint of AB');
+text(AB_mid(1), AB_mid(2), '  Midpoint of AB', 'HorizontalAlignment', ...
+    'left', 'VerticalAlignment', 'bottom');
+
 % Plotting points of intersection between circles
-plot(I1(1), I1(2), 'co', 'DisplayName', 'intersection P1');
-plot(I2(1), I2(2), 'co', 'DisplayName', 'intersection P2');
+plot(I1(1), I1(2), 'mo', 'DisplayName', 'Intersection P1');
+text(I1(1), I1(2), '  Intersection P1', 'HorizontalAlignment', ...
+    'right', 'VerticalAlignment', 'bottom');
+
+plot(I2(1), I2(2), 'mo', 'DisplayName', 'Intersection P2');
+text(I2(1), I2(2), '  Intersection P2', 'HorizontalAlignment', ...
+    'left', 'VerticalAlignment', 'bottom');
+
 grid on;
 xlim([-5 5])
 ylim([-5 5])
+legend('Location', 'best');
 
 %--------------------------------------------------------------------------------
 % FUNCTIONS
@@ -119,13 +135,20 @@ function [intersection1, intersection2] = findCircleIntersections(O1, r1, O2, r2
 end
 
 % Creates geodesic arch
-function arc = createGodesicArc (P1, P2, O, r, boundaryRes)
+function arc = createGodesicArc(P1, P2, O, r, boundaryRes)
     % Calculate angles corresponding to the two points
-    t1 = atan2(P1(2) - O(2), P1(1) - O(1));
-    t2 = atan2(P2(2) - O(2), P2(1) - O(1));
+    angle_P1 = mod(atan2(P1(2) - O(2), P1(1) - O(1)), 2*pi);
+    angle_P2 = mod(atan2(P2(2) - O(2), P2(1) - O(1)), 2*pi);
+
+    % If angle_P1 is greater than angle_P2, swap P1 and P2
+    if angle_P1 > angle_P2
+        temp = P1;
+        P1 = P2;
+        P2 = temp;
+    end
 
     % Generate the parameter values for the arc
-    t = linspace(t1, t2, boundaryRes);
+    t = linspace(angle_P1, angle_P2, boundaryRes);
 
     % Parametric equations for the arc
     arc = O + r * [cos(t); sin(t)].';
