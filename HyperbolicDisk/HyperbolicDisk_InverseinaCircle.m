@@ -37,7 +37,10 @@ AB_r = sqrt((A(1) - B(1))^2 + (A(2) - B(2))^2)/2;
 AB_circ = createCircle(AB_mid, AB_r, boundaryRes);
 
 % Determing the points where Poincaré Disk and AB circle intersect
-[intersection1, intersection2] = findCircleIntersections(O, 1, AB_mid, AB_r);
+[I1, I2] = findCircleIntersections(O, 1, AB_mid, AB_r);
+
+% Finding Geodesic of disk
+Geodesic = createGodesicArc (I1, I2, AB_mid, AB_r, boundaryRes);
 
 %--------------------------------------------------------------------------------
 % PLOTTING
@@ -45,7 +48,7 @@ AB_circ = createCircle(AB_mid, AB_r, boundaryRes);
 % Plotting the boundary circle
 hold on;
 plot(Gamma(:, 1), Gamma(:, 2), 'k-', 'DisplayName', 'Unit Circle');
-plot(AB_circ(:, 1), AB_circ(:, 2), 'k-', 'DisplayName', 'Unit Circle')
+plot(Geodesic(:, 1), Geodesic(:, 2), 'k-', 'DisplayName', 'Unit Circle')
 
 % Plotting the line OA
 fplot(OA_line, 'b--', 'DisplayName', 'Line OA');
@@ -57,8 +60,8 @@ plot(B(1), B(2), 'go', 'DisplayName', 'Point B');
 % Plotting midpoint of AB
 plot(AB_mid(1), AB_mid(2), 'co', 'DisplayName', 'Midpoint of AB');
 % Plotting points of intersection between circles
-plot(intersection1(1), intersection1(2), 'co', 'DisplayName', 'intersection P1');
-plot(intersection2(1), intersection2(2), 'co', 'DisplayName', 'intersection P2');
+plot(I1(1), I1(2), 'co', 'DisplayName', 'intersection P1');
+plot(I2(1), I2(2), 'co', 'DisplayName', 'intersection P2');
 grid on;
 xlim([-5 5])
 ylim([-5 5])
@@ -113,4 +116,17 @@ function [intersection1, intersection2] = findCircleIntersections(O1, r1, O2, r2
     % Extract intersection points from the solution
     intersection1 = double([sol.x(1) + O1(1), sol.y(1) + O1(2)]);
     intersection2 = double([sol.x(2) + O1(1), sol.y(2) + O1(2)]);
+end
+
+% Creates geodesic arch
+function arc = createGodesicArc (P1, P2, O, r, boundaryRes)
+    % Calculate angles corresponding to the two points
+    t1 = atan2(P1(2) - O(2), P1(1) - O(1));
+    t2 = atan2(P2(2) - O(2), P2(1) - O(1));
+
+    % Generate the parameter values for the arc
+    t = linspace(t1, t2, boundaryRes);
+
+    % Parametric equations for the arc
+    arc = O + r * [cos(t); sin(t)].';
 end
