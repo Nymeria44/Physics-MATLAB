@@ -1,5 +1,5 @@
 % --------------------------------------------------------------------------------
-% MATLAB Script for finding geodesic on a Poincaré Disk Model (Hyberbolic
+% MATLAB Script for finding geodesic on a Poincaré Disk Model (Hyperbolic
 % Geometry). 
 % 
 % This is done by taking a point, A, finding the inverse of the
@@ -12,79 +12,57 @@ clear; clc;
 %--------------------------------------------------------------------------------
 % PARAMETERS
 %--------------------------------------------------------------------------------
-simRes = 100; % Number of points used to generate lines
+simRes = 400; % Number of points used to generate lines
 debug = false;
-A = [0.5, 0]; % Point within the unit circle
 O = [0, 0]; % Origin
+i = 10; % Number of geodesics between 0 and 1
+j = 3; % Number of geodesics spaced evenly around circle
 
 %--------------------------------------------------------------------------------
-% CALCULATIONS
+% CALCULATIONS AND PLOTTING
 %--------------------------------------------------------------------------------
+hold on;
+
 % Creating boundary of the Poincaré Disk
 Gamma = createCircle(O, 1, simRes);
 
-% Creating line passing through O A
-OA_line = createSymbolicLine(O, A);
+% Generate geodesics between 0 and 1
+for m = 1:i
+    A = [m / (i + 1), 0]; % Points evenly spaced between 0 and 1
+    
+    % Generate geodesics spaced evenly around the circle
+    for n = 1:j
+        angle = (n - 1) * 360 / j;
+        A = [cosd(angle), sind(angle)] * m / (i + 1);
+        
+        % Creating line passing through O A
+        OA_line = createSymbolicLine(O, A);
 
-% Finding the inversion point B
-B = findInversionPoint(A,O);
+        % Finding the inversion point B
+        B = findInversionPoint(A, O);
 
-% Finding midpoint between A and B
-AB_mid = (A + B) / 2;
+        % Finding midpoint between A and B
+        AB_mid = (A + B) / 2;
 
-% Finding radius for circle passing through A and B
-AB_r = sqrt((A(1) - B(1))^2 + (A(2) - B(2))^2)/2;
+        % Finding radius for circle passing through A and B
+        AB_r = norm(A - B) / 2;
 
-% Creating circle which traces the geodesic
-AB_circ = createCircle(AB_mid, AB_r, simRes);
+        % Determing the points where Poincaré Disk and AB circle intersect
+        [I1, I2] = findCircleIntersections(O, 1, AB_mid, AB_r);
 
-% Determing the points where Poincaré Disk and AB circle intersect
-[I1, I2] = findCircleIntersections(O, 1, AB_mid, AB_r);
+        % Finding Geodesic of disk
+        Geodesic = createGodesicArc(I1, I2, AB_mid, AB_r, simRes,debug);
 
-% Finding Geodesic of disk
-Geodesic = createGodesicArc (I1, I2, AB_mid, AB_r, simRes);
+        % Plotting the geodesic line
+        plot(Geodesic(:, 1), Geodesic(:, 2), 'DisplayName', ['Geodesic Line - Point ', num2str(m), ' - Angle ', num2str(angle)]);
+    end
+end
 
-%--------------------------------------------------------------------------------
-% PLOTTING
-%--------------------------------------------------------------------------------
-% Plotting the boundary of the Poincaré Disk
 hold on;
 plot(Gamma(:, 1), Gamma(:, 2), 'k-', 'DisplayName', 'Unit Circle');
 
-% Plotting AB circle for debugging
-plot(AB_circ(:, 1), AB_circ(:, 2), 'k-', 'DisplayName', 'AB circle');
-
-% Plotting the geodesic line
-plot(Geodesic(:, 1), Geodesic(:, 2), 'k-', 'DisplayName', 'Geodesic Line')
-
-% Plotting the line OA
-fplot(OA_line, 'b--', 'DisplayName', 'Line OA');
-
-% Plotting the point A
-plot(A(1), A(2), 'ro', 'DisplayName', 'Point A');
-text(A(1), A(2), '  A', 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom');
-
-% Plotting the inversion point B
-plot(B(1), B(2), 'go', 'DisplayName', 'Point B');
-text(B(1), B(2), '  B', 'HorizontalAlignment', 'left', 'VerticalAlignment', 'bottom');
-
-% Plotting midpoint of AB
-plot(AB_mid(1), AB_mid(2), 'co', 'DisplayName', 'Midpoint of AB');
-text(AB_mid(1), AB_mid(2), '  Midpoint of AB', 'HorizontalAlignment', ...
-    'left', 'VerticalAlignment', 'bottom');
-
-% Plotting points of intersection between circles
-plot(I1(1), I1(2), 'mo', 'DisplayName', 'Intersection P1');
-text(I1(1), I1(2), '  Intersection P1', 'HorizontalAlignment', ...
-    'right', 'VerticalAlignment', 'bottom');
-
-plot(I2(1), I2(2), 'mo', 'DisplayName', 'Intersection P2');
-text(I2(1), I2(2), '  Intersection P2', 'HorizontalAlignment', ...
-    'left', 'VerticalAlignment', 'bottom');
-
 grid on;
 axis equal;
-legend('Location', 'best');
 
 %--------------------------------------------------------------------------------
 % FUNCTIONS
@@ -137,6 +115,8 @@ function [intersection1, intersection2] = findCircleIntersections(O1, r1, O2, r2
     intersection1 = double([sol.x(1) + O1(1), sol.y(1) + O1(2)]);
     intersection2 = double([sol.x(2) + O1(1), sol.y(2) + O1(2)]);
 end
+
+% Creates geodesic arch
 
 function arc = createGodesicArc(P1, P2, O, r, boundaryRes, debug)
     % Validate input parameters
